@@ -7,7 +7,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-
 )
 
 func TestHelloWorld(t *testing.T) {
