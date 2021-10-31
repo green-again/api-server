@@ -11,7 +11,7 @@ Use `Makefile` to build the project. The command uses `docker-compose` to build 
 make build
 ```
 
-#### Running the Server
+### Running the Server
 The command below run the server.
 ```bash
 make up
