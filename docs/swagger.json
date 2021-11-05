@@ -1,0 +1,24 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a green again backend api server",
+        "title": "Green Again API server",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Print HelloWorld",
+                "responses": {
+                    "200": {
+                        "description": "Hello, World",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
