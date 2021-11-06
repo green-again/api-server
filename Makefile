@@ -28,3 +28,6 @@ test: run
 
 lint: cmd=go vet ./...
 lint: run
+
+swag:
+	swag init -g ./cmd/server/main.go

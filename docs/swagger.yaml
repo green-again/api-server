@@ -1,0 +1,15 @@
+info:
+  contact: {}
+  description: This is a green again backend api server
+  title: Green Again API server
+  version: "1.0"
+paths:
+  /:
+    get:
+      responses:
+        "200":
+          description: Hello, World
+          schema:
+            type: string
+      summary: Print HelloWorld
+swagger: "2.0"
