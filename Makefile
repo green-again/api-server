@@ -12,16 +12,19 @@ help:
 	@echo
 
 build:
-	go build ./cmd/server.go
+	docker-compose build
 
 up:
-	go run ./cmd/server.go
+	docker-compose up
 
-tidy:
-	go mod tidy
+run:
+	docker-compose run --rm app $(cmd)
 
-lint:
-	go vet ./...
+tidy: cmd=go mod tidy
+tidy: run
 
-test:
-	go test ./...
+test: cmd=go test -cover ./...
+test: run
+
+lint: cmd=go vet ./...
+lint: run
