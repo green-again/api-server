@@ -2,5 +2,4 @@
 REPOSITORY=/home/ubuntu
 cd $REPOSITORY
 
-pm2 delete all
-rm -rf green-again
+docker run -i -t --name ga-api green-again:latest
