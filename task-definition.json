@@ -1,0 +1,27 @@
+{
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "inferenceAccelerators": [],
+  "containerDefinitions": [
+    {
+      "name": "ecs-api-server",
+      "image": "ecs-api-server-repository:00000",
+      "essential": true,
+      "protMappings": [
+        {
+          "containerPort": "8080",
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ],
+  "volumes": [],
+  "networkMode": "awsvpc",
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam:cwoojin217@gmail.com:role/ecs-api-server-execution-role",
+  "family": "ecs-api-server-task-definition",
+  "taskRoleArn": "",
+  "placementConstraints": []
+}
