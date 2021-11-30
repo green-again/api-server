@@ -18,6 +18,6 @@ func TestHelloWorld(t *testing.T) {
 
 	if assert.NoError(t, HelloWorld(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, "Hello, Green-Again!", rec.Body.String())
+		assert.Equal(t, "Hello, Green-Again! Let's Start!", rec.Body.String())
 	}
 }
