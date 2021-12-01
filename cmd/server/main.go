@@ -25,5 +25,5 @@ func main() {
 // @Success 200 {string} result "Hello, World"
 // @Router / [get]
 func HelloWorld(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	return c.String(http.StatusOK, "Hello, Green-Again! Let's Start!")
 }
