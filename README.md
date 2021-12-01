@@ -28,3 +28,6 @@ You can run all tests with the command below.
 ```bash
 make test
 ```
+
+### Deploy
+It will be deployed by merging into the main branch.
