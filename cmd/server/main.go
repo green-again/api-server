@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	echoSwagger "github.com/swaggo/echo-swagger"
 
 	_ "api-server/docs"
+	"api-server/internal/api"
 )
 
 // @title Green Again API server
@@ -16,7 +16,7 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/", HelloWorld)
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	api.InitRoutes(e)
 	e.Logger.Fatal(e.Start(":8000"))
 }
 

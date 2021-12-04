@@ -1,49 +1,61 @@
 package api_test
 
 import (
-	"api-server/internal/app/article/domain"
-	"api-server/internal/app/article/presentation/api"
-	"fmt"
-	"github.com/bxcodec/faker/v3"
+	"encoding/json"
+
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
+	"api-server/internal/app/article/application"
+	"api-server/internal/app/article/domain"
+	"api-server/internal/app/article/presentation/api"
 )
 
 func (ts *ControllerTestSuite) TestGetArticles() {
 	tests := []struct {
-		scenario string
-		description string
-		pathParams string
-		mockArticle domain.Article
-		expectedResponse string
-		expectedCode int
+		scenario         string
+		description      string
+		pathParams       string
+		mockFunc         func() (*domain.Article, error)
+		expectedResponse api.Article
+		expectedCode     int
 	}{
 		{
-			scenario: "happy path",
+			scenario:   "happy path",
 			pathParams: MockArticles()[0].ID,
-			mockArticle: MockArticles()[0],
+			mockFunc: func() (*domain.Article, error) {
+				return &MockArticles()[0], nil
+			},
 			expectedResponse: MockArticlesResponse()[0],
-			expectedCode: http.StatusOK,
+			expectedCode:     http.StatusOK,
 		},
 		{
-			scenario: "If the request has the wrong parameter, you should get a 400 error.",
-			pathParams: MockArticles()[0].ID,
-			mockArticle: MockArticles()[0],
-			expectedResponse: MockArticlesResponse()[0],
+			scenario:     "If the request has the wrong parameter, you should get a 400 error.",
+			pathParams:   "1",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			scenario: "If the request is an article ID that does not exist, a 404 error should be returned.",
-			pathParams: MockArticles()[0].ID,
-			mockArticle: MockArticles()[0],
-			expectedResponse: MockArticlesResponse()[0],
+			scenario:   "If the request is an article ID that does not exist, a 404 error should be returned.",
+			pathParams: MockArticles()[1].ID,
+			mockFunc: func() (*domain.Article, error) {
+				return nil, application.NewNotFoundError(MockArticles()[1].ID)
+			},
 			expectedCode: http.StatusNotFound,
+		},
+		{
+			scenario:   "If an unknown error occurs during processing, an error 500 should be returned.",
+			pathParams: MockArticles()[2].ID,
+			mockFunc: func() (*domain.Article, error) {
+				return nil, application.NewUnknownError("test unknown error")
+			},
+			expectedCode: http.StatusInternalServerError,
 		},
 	}
 
@@ -57,25 +69,40 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 		c.SetParamNames("id")
 		c.SetParamValues(tt.pathParams)
 
-		err := ts.controller.GetArticles(c)
+		if tt.mockFunc != nil {
+			ts.handler.On("GetArticleByID", tt.pathParams).Return(tt.mockFunc()).Once()
+		}
+		err := ts.controller.GetArticle(c)
 
 		ts.NoError(err)
 		ts.Equal(tt.expectedCode, rec.Code)
-		ts.Equal(tt.expectedResponse, rec.Body.String())
+
+		if tt.expectedCode == http.StatusOK {
+			var actualResp api.Article
+			json.Unmarshal(rec.Body.Bytes(), &actualResp)
+
+			ts.Equal(tt.expectedResponse, actualResp)
+		}
 	}
 }
 
 type ControllerTestSuite struct {
 	suite.Suite
-	controller api.ArticleController
+	handler    *mockHandler
+	controller *api.ArticleController
 }
 
 func TestControllerSuite(t *testing.T) {
 	suite.Run(t, new(ControllerTestSuite))
 }
 
+func (ts *ControllerTestSuite) SetupTest() {
+	ts.handler = new(mockHandler)
+	ts.controller = api.NewController(ts.handler, api.NewGetArticleRequestValidator())
+}
 
 var mockArticles []domain.Article
+
 func MockArticles() []domain.Article {
 	if mockArticles != nil {
 		return mockArticles
@@ -83,28 +110,34 @@ func MockArticles() []domain.Article {
 
 	for i := 0; i < 3; i++ {
 		mockArticles = append(mockArticles, domain.Article{
-			ID:            uuid.NewString(),
-			Title:         faker.Sentence(),
-			Author:        faker.Name(),
-			Source:        faker.URL(),
-			Body:          faker.Paragraph(),
-			PublishedDate: time.Now(),
+			ID:     uuid.NewString(),
+			Title:  faker.Sentence(),
+			Author: faker.Name(),
+			Source: faker.URL(),
+			Body:   faker.Paragraph(),
 		})
 	}
 	return mockArticles
 }
 
-var mockArticlesResponse []string
-func MockArticlesResponse() []string {
+var mockArticlesResponse []api.Article
+
+func MockArticlesResponse() []api.Article {
 	if mockArticlesResponse != nil {
 		return mockArticlesResponse
 	}
 
 	for _, article := range MockArticles() {
-		res := fmt.Sprintf(`{"article": {"id": "%s","title": "%s","author": "%s","source": "%s","publishedDate": "%s","body": "%s"}}`,
-			article.ID, article.Title, article.Author, article.Source, article.PublishedDate, article.Body)
-
-		mockArticlesResponse = append(mockArticlesResponse, res)
+		mockArticlesResponse = append(mockArticlesResponse, api.MapArticleResponse(&article))
 	}
 	return mockArticlesResponse
+}
+
+type mockHandler struct {
+	mock.Mock
+}
+
+func (h *mockHandler) GetArticleByID(id string) (*domain.Article, error) {
+	ret := h.Called(id)
+	return ret.Get(0).(*domain.Article), ret.Error(1)
 }
