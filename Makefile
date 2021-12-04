@@ -26,6 +26,9 @@ tidy: run
 test: cmd=go test -cover ./...
 test: run
 
+test-native:
+	go test -cover ./...
+
 lint: cmd=go vet ./...
 lint: run
 
