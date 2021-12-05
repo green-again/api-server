@@ -32,5 +32,8 @@ test-native:
 lint: cmd=go vet ./...
 lint: run
 
+migrate: cmd=go run ./cmd/migrations/main.go
+migrate: run
+
 swag:
 	swag init -g ./cmd/server/main.go

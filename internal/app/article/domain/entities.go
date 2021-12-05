@@ -51,7 +51,8 @@ func (a *Article) GenerateID() error {
 	if a.id != "" {
 		return fmt.Errorf("id is already exists")
 	}
-	a.id = uuid.NewString()
+	id, _ := uuid.NewUUID()
+	a.id = id.String()
 	return nil
 }
 

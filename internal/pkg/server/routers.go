@@ -16,8 +16,8 @@ func InitRoutes(router *echo.Echo, articleController *article.ArticleController)
 func registerV1APIRoutes(router *echo.Echo, articleController *article.ArticleController) {
 	v1 := router.Group("api/v1")
 	{
-		v1.GET("/articles/:id", articleController.GetArticle)
 		v1.POST("/articles", articleController.PostArticle)
+		v1.GET("/articles/:id", articleController.GetArticle)
 	}
 }
 

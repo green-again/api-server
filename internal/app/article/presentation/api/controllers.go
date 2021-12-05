@@ -51,7 +51,7 @@ func (con *ArticleController) PostArticle(c echo.Context) error {
 		return con.handleErrorResponse(c, err)
 	}
 
-	return c.JSON(http.StatusCreated, res)
+	return c.JSON(http.StatusCreated, MapArticleResponse(res))
 }
 
 func (con *ArticleController) handleErrorResponse(c echo.Context, err error) error {
@@ -63,7 +63,7 @@ func (con *ArticleController) handleErrorResponse(c echo.Context, err error) err
 	case application.UnknownError:
 		return c.JSON(http.StatusInternalServerError, apipkg.NewErrorResponse(Unknown, "internal server error.", err.Error()))
 	}
-	return c.JSON(http.StatusInternalServerError, err.Error())
+	return c.JSON(http.StatusInternalServerError, apipkg.NewErrorResponse(Unknown, "internal server error.", err.Error()))
 }
 
 func NewController(handler application.Handler, validator apipkg.Validator) *ArticleController {
