@@ -3,7 +3,6 @@ package api_test
 import (
 	"encoding/json"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bxcodec/faker/v3"
@@ -29,7 +28,7 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 	}{
 		{
 			scenario:   "happy path",
-			pathParams: MockArticles()[0].ID,
+			pathParams: MockArticles()[0].ID(),
 			mockFunc: func() (*domain.Article, error) {
 				return &MockArticles()[0], nil
 			},
@@ -43,15 +42,15 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 		},
 		{
 			scenario:   "If the request is an article ID that does not exist, a 404 error should be returned.",
-			pathParams: MockArticles()[1].ID,
+			pathParams: MockArticles()[1].ID(),
 			mockFunc: func() (*domain.Article, error) {
-				return nil, application.NewNotFoundError(MockArticles()[1].ID)
+				return nil, application.NewNotFoundError(MockArticles()[1].ID())
 			},
 			expectedCode: http.StatusNotFound,
 		},
 		{
 			scenario:   "If an unknown error occurs during processing, an error 500 should be returned.",
-			pathParams: MockArticles()[2].ID,
+			pathParams: MockArticles()[2].ID(),
 			mockFunc: func() (*domain.Article, error) {
 				return nil, application.NewUnknownError("test unknown error")
 			},
@@ -109,13 +108,7 @@ func MockArticles() []domain.Article {
 	}
 
 	for i := 0; i < 3; i++ {
-		mockArticles = append(mockArticles, domain.Article{
-			ID:     uuid.NewString(),
-			Title:  faker.Sentence(),
-			Author: faker.Name(),
-			Source: faker.URL(),
-			Body:   faker.Paragraph(),
-		})
+		mockArticles = append(mockArticles, domain.NewArticle(faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph()))
 	}
 	return mockArticles
 }
