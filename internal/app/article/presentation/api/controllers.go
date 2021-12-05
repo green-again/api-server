@@ -19,7 +19,7 @@ type ArticleController struct {
 // @Summary      Show an article details.
 // @Description  GetArticle finds and returns one Article by request ID.
 // @Tags         Articles
-// @Param        id   path      int  true  "Article ID"
+// @Param        id   path      string  true  "Article ID"
 // @Produce      json
 // @Success      200  {object}  Article
 // @Failure      400  {object}  errors.ErrorResponse

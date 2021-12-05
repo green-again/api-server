@@ -48,7 +48,7 @@ var doc = `{
                 "summary": "Show an article details.",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Article ID",
                         "name": "id",
                         "in": "path",
