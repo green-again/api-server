@@ -1,4 +1,6 @@
-package errors
+package api
+
+import "fmt"
 
 type ErrorCode string
 
@@ -14,4 +16,16 @@ func NewErrorResponse(code ErrorCode, message, detail string) ErrorResponse {
 		Message:   message,
 		Detail:    detail,
 	}
+}
+
+type InvalidRequestError struct {
+	message string
+}
+
+func (e InvalidRequestError) Error() string {
+	return fmt.Sprintf("invalid request. %s", e.message)
+}
+
+func NewInvalidRequestError(message string) InvalidRequestError {
+	return InvalidRequestError{message: message}
 }

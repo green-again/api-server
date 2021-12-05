@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"time"
 )
@@ -40,9 +41,17 @@ func (a *Article) PublishedDate() *time.Time {
 	return a.publishedDate
 }
 
-func NewArticle(title, author, source, body string) Article {
+func (a *Article) GenerateID() error {
+	if a.id != "" {
+		return fmt.Errorf("id is already exists")
+	}
+	a.id = uuid.NewString()
+	return nil
+}
+
+func NewArticle(id, title, author, source, body string) Article {
 	return Article{
-		id: uuid.NewString(),
+		id: id,
 		title: title,
 		author: author,
 		source: source,

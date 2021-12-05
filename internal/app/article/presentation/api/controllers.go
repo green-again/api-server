@@ -6,13 +6,13 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"api-server/internal/app/article/application"
-	"api-server/internal/pkg/api/errors"
-	"api-server/internal/pkg/api/validators"
+	apipkg "api-server/internal/pkg/api"
 )
 
 type ArticleController struct {
+	apipkg.RequestBinder
 	handler   application.Handler
-	validator validators.Validator
+	validator apipkg.Validator
 }
 
 // GetArticle godoc
@@ -40,18 +40,32 @@ func (con *ArticleController) GetArticle(c echo.Context) error {
 	return c.JSON(http.StatusOK, MapArticleResponse(article))
 }
 
+func (con *ArticleController) PostArticle(c echo.Context) error {
+	article := new(Article)
+	if err := con.Bind(c, article); err != nil {
+		return con.handleErrorResponse(c, err)
+	}
+
+	res, err := con.handler.CreateArticle(article.Title, article.Author, article.Source, article.Body)
+	if err != nil {
+		return con.handleErrorResponse(c, err)
+	}
+
+	return c.JSON(http.StatusCreated, res)
+}
+
 func (con *ArticleController) handleErrorResponse(c echo.Context, err error) error {
 	switch err.(type) {
-	case InvalidRequestError:
-		return c.JSON(http.StatusBadRequest, errors.NewErrorResponse(InvalidRequest, "invalid request.", err.Error()))
+	case apipkg.InvalidRequestError:
+		return c.JSON(http.StatusBadRequest, apipkg.NewErrorResponse(InvalidRequest, "invalid request.", err.Error()))
 	case application.NotFoundError:
-		return c.JSON(http.StatusNotFound, errors.NewErrorResponse(NotFound, "resource not found.", err.Error()))
+		return c.JSON(http.StatusNotFound, apipkg.NewErrorResponse(NotFound, "resource not found.", err.Error()))
 	case application.UnknownError:
-		return c.JSON(http.StatusInternalServerError, errors.NewErrorResponse(Unknown, "internal server error.", err.Error()))
+		return c.JSON(http.StatusInternalServerError, apipkg.NewErrorResponse(Unknown, "internal server error.", err.Error()))
 	}
 	return c.JSON(http.StatusInternalServerError, err.Error())
 }
 
-func NewController(handler application.Handler, validator validators.Validator) *ArticleController {
+func NewController(handler application.Handler, validator apipkg.Validator) *ArticleController {
 	return &ArticleController{handler: handler, validator: validator}
 }

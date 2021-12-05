@@ -2,7 +2,10 @@ package api_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 
 	"github.com/bxcodec/faker/v3"
@@ -15,12 +18,85 @@ import (
 	"api-server/internal/app/article/application"
 	"api-server/internal/app/article/domain"
 	"api-server/internal/app/article/presentation/api"
+	apipkg "api-server/internal/pkg/api"
 )
+
+func (ts *ControllerTestSuite) TestPostArticles() {
+	tests := []struct {
+		scenario         string
+		requestBody      string
+		mockFunc         func() (*domain.Article, error)
+		expectedCode     int
+	}{
+		{
+			scenario: "Happy path",
+			requestBody: fmt.Sprintf(
+				`{"title":"%s","body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Sentence(),
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				1,
+			),
+			mockFunc: func() (*domain.Article, error) {
+				return &MockArticles()[0], nil
+			},
+			expectedCode: http.StatusCreated,
+		},
+		{
+			scenario: "If parameter is missing, it should returns 400 error.",
+			requestBody: fmt.Sprintf(
+				`{"body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				1,
+			),
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			scenario: "If an unknown error occurs during processing, an error 500 should be returned.",
+			requestBody: fmt.Sprintf(
+				`{"title":"%s","body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Sentence(),
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				1,
+			),
+			mockFunc: func() (*domain.Article, error) {
+				return nil, application.NewUnknownError("test unknown error")
+			},
+			expectedCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		e := echo.New()
+		e.Validator = apipkg.NewRequestValidator()
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/articles", strings.NewReader(tt.requestBody))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		if tt.mockFunc != nil {
+			ts.handler.On(
+				"CreateArticle",
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+			).Return(tt.mockFunc()).Once()
+		}
+		err := ts.controller.PostArticle(c)
+		ts.NoError(err)
+		ts.Equal(tt.expectedCode, rec.Code)
+	}
+}
 
 func (ts *ControllerTestSuite) TestGetArticles() {
 	tests := []struct {
 		scenario         string
-		description      string
 		pathParams       string
 		mockFunc         func() (*domain.Article, error)
 		expectedResponse api.Article
@@ -60,6 +136,7 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 
 	for _, tt := range tests {
 		e := echo.New()
+		e.Validator = apipkg.NewRequestValidator()
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
 		rec := httptest.NewRecorder()
 
@@ -108,7 +185,7 @@ func MockArticles() []domain.Article {
 	}
 
 	for i := 0; i < 3; i++ {
-		mockArticles = append(mockArticles, domain.NewArticle(faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph()))
+		mockArticles = append(mockArticles, domain.NewArticle(uuid.NewString(), faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph()))
 	}
 	return mockArticles
 }
@@ -132,5 +209,10 @@ type mockHandler struct {
 
 func (h *mockHandler) GetArticleByID(id string) (*domain.Article, error) {
 	ret := h.Called(id)
+	return ret.Get(0).(*domain.Article), ret.Error(1)
+}
+
+func (h *mockHandler) CreateArticle(title, author, source, body string) (*domain.Article, error) {
+	ret := h.Called(title, author, source, body)
 	return ret.Get(0).(*domain.Article), ret.Error(1)
 }
