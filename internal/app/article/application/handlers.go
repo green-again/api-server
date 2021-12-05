@@ -8,7 +8,7 @@ import (
 
 type Handler interface {
 	GetArticleByID(id string) (*domain.Article, error)
-	CreateArticle(title, author, source, body string) (*domain.Article, error)
+	CreateArticle(title, author, source, body string, status int) (*domain.Article, error)
 }
 
 type articleHandler struct{
@@ -24,8 +24,8 @@ func (h *articleHandler) GetArticleByID(id string) (*domain.Article, error) {
 	return article, nil
 }
 
-func (h *articleHandler) CreateArticle(title, author, source, body string) (*domain.Article, error) {
-	article := domain.NewArticle("", title, author, source, body)
+func (h *articleHandler) CreateArticle(title, author, source, body string, status int) (*domain.Article, error) {
+	article := domain.NewArticle("", title, author, source, body, status)
 	article.GenerateID()
 
 	err := h.repo.SaveArticle(&article)
@@ -36,6 +36,6 @@ func (h *articleHandler) CreateArticle(title, author, source, body string) (*dom
 	return &article, nil
 }
 
-func NewArticleHandler() Handler {
-	return &articleHandler{}
+func NewArticleHandler(repository domain.ArticleRepository) Handler {
+	return &articleHandler{repo: repository}
 }

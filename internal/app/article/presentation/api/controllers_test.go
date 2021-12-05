@@ -86,6 +86,7 @@ func (ts *ControllerTestSuite) TestPostArticles() {
 				mock.AnythingOfType("string"),
 				mock.AnythingOfType("string"),
 				mock.AnythingOfType("string"),
+				mock.AnythingOfType("int"),
 			).Return(tt.mockFunc()).Once()
 		}
 		err := ts.controller.PostArticle(c)
@@ -185,7 +186,7 @@ func MockArticles() []domain.Article {
 	}
 
 	for i := 0; i < 3; i++ {
-		mockArticles = append(mockArticles, domain.NewArticle(uuid.NewString(), faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph()))
+		mockArticles = append(mockArticles, domain.NewArticle(uuid.NewString(), faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), 1))
 	}
 	return mockArticles
 }
@@ -212,7 +213,7 @@ func (h *mockHandler) GetArticleByID(id string) (*domain.Article, error) {
 	return ret.Get(0).(*domain.Article), ret.Error(1)
 }
 
-func (h *mockHandler) CreateArticle(title, author, source, body string) (*domain.Article, error) {
-	ret := h.Called(title, author, source, body)
+func (h *mockHandler) CreateArticle(title, author, source, body string, status int) (*domain.Article, error) {
+	ret := h.Called(title, author, source, body, status)
 	return ret.Get(0).(*domain.Article), ret.Error(1)
 }

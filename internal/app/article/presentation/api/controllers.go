@@ -46,7 +46,7 @@ func (con *ArticleController) PostArticle(c echo.Context) error {
 		return con.handleErrorResponse(c, err)
 	}
 
-	res, err := con.handler.CreateArticle(article.Title, article.Author, article.Source, article.Body)
+	res, err := con.handler.CreateArticle(article.Title, article.Author, article.Source, article.Body, article.Status)
 	if err != nil {
 		return con.handleErrorResponse(c, err)
 	}

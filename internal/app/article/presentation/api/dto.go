@@ -20,7 +20,7 @@ type Article struct {
 }
 
 func (a *Article) MapDomain() domain.Article {
-	return domain.NewArticle(a.ID, a.Title, a.Author, a.Source, a.Body)
+	return domain.NewArticle(a.ID, a.Title, a.Author, a.Source, a.Body, a.Status)
 }
 
 func MapArticleResponse(entity *domain.Article) Article {

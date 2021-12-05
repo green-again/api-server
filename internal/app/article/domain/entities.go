@@ -14,6 +14,8 @@ type Article struct {
 
 	body string
 
+	status int
+
 	publishedDate *time.Time
 }
 
@@ -37,6 +39,10 @@ func (a *Article) Body() string {
 	return a.body
 }
 
+func (a *Article) Status() int {
+	return a.status
+}
+
 func (a *Article) PublishedDate() *time.Time {
 	return a.publishedDate
 }
@@ -49,12 +55,13 @@ func (a *Article) GenerateID() error {
 	return nil
 }
 
-func NewArticle(id, title, author, source, body string) Article {
+func NewArticle(id, title, author, source, body string, status int) Article {
 	return Article{
 		id: id,
 		title: title,
 		author: author,
 		source: source,
+		status: status,
 		body: body,
 	}
 }

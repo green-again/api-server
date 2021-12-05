@@ -6,7 +6,12 @@ import (
 	"github.com/labstack/echo/v4"
 
 	_ "api-server/docs"
-	"api-server/internal/api"
+	"api-server/internal/app/article/application"
+	"api-server/internal/app/article/infrastructure/persistence"
+	"api-server/internal/app/article/presentation/api"
+	"api-server/internal/pkg/config"
+	"api-server/internal/pkg/db"
+	"api-server/internal/pkg/server"
 )
 
 // @title Green Again API server
@@ -14,10 +19,20 @@ import (
 // @description This is a green again backend api server
 // BasePath /v1
 func main() {
-	e := echo.New()
-	e.GET("/", HelloWorld)
-	api.InitRoutes(e)
-	e.Logger.Fatal(e.Start(":8000"))
+	config.InitConfig()
+	var (
+		dbEngine = db.ConnectDB()
+
+		articleRepository = persistence.NewArticleRepository(dbEngine)
+		articleHandler = application.NewArticleHandler(articleRepository)
+		articleValidator = api.NewGetArticleRequestValidator()
+		articleController = api.NewController(articleHandler, articleValidator)
+
+		server = server.NewHTTPServer(articleController)
+	)
+
+	server.GET("/", HelloWorld)
+	server.Logger.Fatal(server.Start(":8000"))
 }
 
 // HelloWorld godoc
