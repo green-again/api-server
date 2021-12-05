@@ -11,10 +11,18 @@ definitions:
         type: string
       source:
         type: string
+      status:
+        type: integer
       title:
         type: string
+    required:
+    - author
+    - body
+    - source
+    - status
+    - title
     type: object
-  errors.ErrorResponse:
+  api.ErrorResponse:
     properties:
       detail:
         type: string
@@ -37,6 +45,38 @@ paths:
           schema:
             type: string
       summary: Print HelloWorld
+  /api/v1/articles:
+    post:
+      description: PostArticle creates a new article and stores it in the data source.
+      parameters:
+      - description: Article ingredient
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/api.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Article'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Create new article.
+      tags:
+      - Articles
   /api/v1/articles/{id}:
     get:
       description: GetArticle finds and returns one Article by request ID.
@@ -56,15 +96,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Show an article details.
       tags:
       - Articles

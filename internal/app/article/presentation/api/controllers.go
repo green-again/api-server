@@ -22,9 +22,9 @@ type ArticleController struct {
 // @Param        id   path      string  true  "Article ID"
 // @Produce      json
 // @Success      200  {object}  Article
-// @Failure      400  {object}  errors.ErrorResponse
-// @Failure      404  {object}  errors.ErrorResponse
-// @Failure      500  {object}  errors.ErrorResponse
+// @Failure      400  {object}  api.ErrorResponse
+// @Failure      404  {object}  api.ErrorResponse
+// @Failure      500  {object}  api.ErrorResponse
 // @Router       /api/v1/articles/{id} [get]
 func (con *ArticleController) GetArticle(c echo.Context) error {
 	id := c.Param("id")
@@ -40,6 +40,17 @@ func (con *ArticleController) GetArticle(c echo.Context) error {
 	return c.JSON(http.StatusOK, MapArticleResponse(article))
 }
 
+// PostArticle godoc
+// @Summary      Create new article.
+// @Description  PostArticle creates a new article and stores it in the data source.
+// @Tags         Articles
+// @Param        article   body Article true  "Article ingredient"
+// @Produce      json
+// @Success      200  {object}  Article
+// @Failure      400  {object}  api.ErrorResponse
+// @Failure      404  {object}  api.ErrorResponse
+// @Failure      500  {object}  api.ErrorResponse
+// @Router       /api/v1/articles [post]
 func (con *ArticleController) PostArticle(c echo.Context) error {
 	article := new(Article)
 	if err := con.Bind(c, article); err != nil {

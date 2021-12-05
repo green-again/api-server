@@ -36,6 +36,55 @@ var doc = `{
                 }
             }
         },
+        "/api/v1/articles": {
+            "post": {
+                "description": "PostArticle creates a new article and stores it in the data source.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Create new article.",
+                "parameters": [
+                    {
+                        "description": "Article ingredient",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Article"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Article"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/articles/{id}": {
             "get": {
                 "description": "GetArticle finds and returns one Article by request ID.",
@@ -65,19 +114,19 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -87,6 +136,13 @@ var doc = `{
     "definitions": {
         "api.Article": {
             "type": "object",
+            "required": [
+                "author",
+                "body",
+                "source",
+                "status",
+                "title"
+            ],
             "properties": {
                 "author": {
                     "type": "string"
@@ -103,12 +159,15 @@ var doc = `{
                 "source": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "integer"
+                },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "errors.ErrorResponse": {
+        "api.ErrorResponse": {
             "type": "object",
             "properties": {
                 "detail": {
