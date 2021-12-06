@@ -10,11 +10,11 @@ type RequestBinder struct {}
 
 func (b RequestBinder) Bind(c echo.Context, model interface{}) error {
 	if err := c.Bind(model); err != nil {
-		return NewInvalidRequestError(err.Error())
+		return InvalidRequestError
 	}
 
 	if err := c.Validate(model); err != nil {
-		return NewInvalidRequestError(err.Error())
+		return InvalidRequestError
 	}
 	return nil
 }

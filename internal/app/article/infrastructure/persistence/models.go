@@ -26,7 +26,7 @@ type Article struct {
 }
 
 func (a *Article) setID(articleID string) error {
-	id, err := parseID(articleID)
+	id, err := marshalID(articleID)
 	if err != nil {
 		return err
 	}
@@ -37,19 +37,20 @@ func (a *Article) setID(articleID string) error {
 func (a *Article) toDomain() (*domain.Article, error) {
 	uid, err := uuid.FromBytes(a.ID)
 	if err != nil {
-		return nil, fmt.Errorf("article id unmarshaling error. %w", err)
+		return nil, fmt.Errorf("%w article id: %b", UnmarshalBinaryError, a.ID)
 	}
 
 	ret := domain.NewArticle(uid.String(), a.Title, a.Author, a.Source, a.Body, a.Status)
 	return &ret, nil
 }
 
-func parseID(articleID string) ([]byte, error) {
-	id, err := uuid.MustParse(articleID).MarshalBinary()
+func marshalID(articleID string) ([]byte, error) {
+	id, err := uuid.Parse(articleID)
 	if err != nil {
-		return nil, fmt.Errorf("article id marshaling error. %w", err)
+		return nil, ParseUUIDError
 	}
-	return id, nil
+
+	return id.MarshalBinary()
 }
 
 func NewArticleModel(article *domain.Article) (*Article, error) {
@@ -64,7 +65,7 @@ func NewArticleModel(article *domain.Article) (*Article, error) {
 
 	err := ret.setID(article.ID())
 	if err != nil {
-		return nil, fmt.Errorf("article model construct error. %w", err)
+		return nil, err
 	}
 
 	return ret, nil

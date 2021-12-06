@@ -1,6 +1,8 @@
 package http
 
-import "fmt"
+import (
+	"errors"
+)
 
 type ErrorCode string
 
@@ -18,14 +20,6 @@ func NewErrorResponse(code ErrorCode, message, detail string) ErrorResponse {
 	}
 }
 
-type InvalidRequestError struct {
-	message string
-}
-
-func (e InvalidRequestError) Error() string {
-	return fmt.Sprintf("invalid request. %s", e.message)
-}
-
-func NewInvalidRequestError(message string) InvalidRequestError {
-	return InvalidRequestError{message: message}
-}
+var (
+	InvalidRequestError = errors.New("invalid request error")
+)

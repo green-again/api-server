@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -15,8 +16,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"api-server/internal/app/article/application"
 	"api-server/internal/app/article/domain"
+	"api-server/internal/app/article/infrastructure/persistence"
 	"api-server/internal/app/article/presentation/api"
 	httpapi "api-server/internal/pkg/http"
 )
@@ -65,7 +66,7 @@ func (ts *ControllerTestSuite) TestPostArticles() {
 				1,
 			),
 			mockFunc: func() (*domain.Article, error) {
-				return nil, application.NewUnknownError("test unknown error")
+				return nil, errors.New("unknown error")
 			},
 			expectedCode: http.StatusInternalServerError,
 		},
@@ -121,7 +122,7 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 			scenario:   "If the request is an article ID that does not exist, a 404 error should be returned.",
 			pathParams: MockArticles()[1].ID(),
 			mockFunc: func() (*domain.Article, error) {
-				return nil, application.NewNotFoundError(MockArticles()[1].ID())
+				return nil, persistence.NotFoundError
 			},
 			expectedCode: http.StatusNotFound,
 		},
@@ -129,7 +130,7 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 			scenario:   "If an unknown error occurs during processing, an error 500 should be returned.",
 			pathParams: MockArticles()[2].ID(),
 			mockFunc: func() (*domain.Article, error) {
-				return nil, application.NewUnknownError("test unknown error")
+				return nil, errors.New("unknown error")
 			},
 			expectedCode: http.StatusInternalServerError,
 		},
