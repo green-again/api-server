@@ -18,7 +18,7 @@ import (
 	"api-server/internal/app/article/application"
 	"api-server/internal/app/article/domain"
 	"api-server/internal/app/article/presentation/api"
-	apipkg "api-server/internal/pkg/api"
+	httpapi "api-server/internal/pkg/http"
 )
 
 func (ts *ControllerTestSuite) TestPostArticles() {
@@ -73,8 +73,8 @@ func (ts *ControllerTestSuite) TestPostArticles() {
 
 	for _, tt := range tests {
 		e := echo.New()
-		e.Validator = apipkg.NewRequestValidator()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/articles", strings.NewReader(tt.requestBody))
+		e.Validator = httpapi.NewRequestValidator()
+		req := httptest.NewRequest(http.MethodPost, "/http/v1/articles", strings.NewReader(tt.requestBody))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
@@ -137,8 +137,8 @@ func (ts *ControllerTestSuite) TestGetArticles() {
 
 	for _, tt := range tests {
 		e := echo.New()
-		e.Validator = apipkg.NewRequestValidator()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
+		e.Validator = httpapi.NewRequestValidator()
+		req := httptest.NewRequest(http.MethodGet, "/http/v1/", nil)
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)

@@ -14,30 +14,28 @@ type dbConfig struct {
 	dbPort string
 }
 
-func DBHost() string {
-	return config.dbHost
+func (c Config) DBHost() string {
+	return c.dbHost
 }
 
-func DBPort() string {
-	return config.dbPort
+func (c Config) DBPort() string {
+	return c.dbPort
 }
 
-func DBName() string {
-	return config.dbName
+func (c Config) DBName() string {
+	return c.dbName
 }
 
-func DBUser() string {
-	return config.dbUser
+func (c Config) DBUser() string {
+	return c.dbUser
 }
 
-func DBPassword() string {
-	return config.dbPassword
+func (c Config) DBPassword() string {
+	return c.dbPassword
 }
 
-var config Config
-
-func InitConfig() {
-	config = Config{
+func Make() Config {
+	return Config{
 		dbConfig{
 			dbHost:     os.Getenv("DB_HOST"),
 			dbUser:     os.Getenv("DB_USER"),

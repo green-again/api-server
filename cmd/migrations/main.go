@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	config.InitConfig()
-	db := db.ConnectDB()
+	cfg := config.Make()
+	db := db.ConnectDatabase(&cfg)
 	err := db.AutoMigrate(&persistence.Article{})
 	if err != nil {
 		fmt.Println(fmt.Errorf("migration error. %w", err))

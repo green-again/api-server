@@ -33,7 +33,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: This is a green again backend api server
+  description: This is a green again backend http server
   title: Green Again API server
   version: "1.0"
 paths:
@@ -54,26 +54,26 @@ paths:
         name: article
         required: true
         schema:
-          $ref: '#/definitions/api.Article'
+          $ref: '#/definitions/http.Article'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.Article'
+            $ref: '#/definitions/http.Article'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       summary: Create new article.
       tags:
       - Articles
@@ -92,19 +92,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.Article'
+            $ref: '#/definitions/http.Article'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/http.ErrorResponse'
       summary: Show an article details.
       tags:
       - Articles

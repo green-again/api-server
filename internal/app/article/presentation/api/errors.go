@@ -1,11 +1,11 @@
 package api
 
 import (
-	apipkg "api-server/internal/pkg/api"
+	"api-server/internal/pkg/http"
 )
 
 const (
-	InvalidRequest apipkg.ErrorCode = "article-01"
-	NotFound       apipkg.ErrorCode = "article-02"
-	Unknown        apipkg.ErrorCode = "article-03"
+	InvalidRequest http.ErrorCode = "article-01"
+	NotFound       http.ErrorCode = "article-02"
+	Unknown        http.ErrorCode = "article-03"
 )

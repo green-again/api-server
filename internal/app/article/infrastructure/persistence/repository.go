@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"fmt"
+
 	"gorm.io/gorm"
 
 	"api-server/internal/app/article/domain"

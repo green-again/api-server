@@ -8,7 +8,7 @@ import (
 	article "api-server/internal/app/article/presentation/api"
 )
 
-func InitRoutes(router *echo.Echo, articleController *article.ArticleController) {
+func BuildRouter(router *echo.Echo, articleController *article.ArticleController) {
 	registerV1APIRoutes(router, articleController)
 	registerSwagger(router)
 }

@@ -6,13 +6,13 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"api-server/internal/app/article/application"
-	apipkg "api-server/internal/pkg/api"
+	httpapi "api-server/internal/pkg/http"
 )
 
 type ArticleController struct {
-	apipkg.RequestBinder
+	httpapi.RequestBinder
 	handler   application.Handler
-	validator apipkg.Validator
+	validator httpapi.Validator
 }
 
 // GetArticle godoc
@@ -22,10 +22,10 @@ type ArticleController struct {
 // @Param        id   path      string  true  "Article ID"
 // @Produce      json
 // @Success      200  {object}  Article
-// @Failure      400  {object}  api.ErrorResponse
-// @Failure      404  {object}  api.ErrorResponse
-// @Failure      500  {object}  api.ErrorResponse
-// @Router       /api/v1/articles/{id} [get]
+// @Failure      400  {object}  http.ErrorResponse
+// @Failure      404  {object}  http.ErrorResponse
+// @Failure      500  {object}  http.ErrorResponse
+// @Router       /http/v1/articles/{id} [get]
 func (con *ArticleController) GetArticle(c echo.Context) error {
 	id := c.Param("id")
 	if err := con.validator.Validate(id); err != nil {
@@ -47,10 +47,10 @@ func (con *ArticleController) GetArticle(c echo.Context) error {
 // @Param        article   body Article true  "Article ingredient"
 // @Produce      json
 // @Success      200  {object}  Article
-// @Failure      400  {object}  api.ErrorResponse
-// @Failure      404  {object}  api.ErrorResponse
-// @Failure      500  {object}  api.ErrorResponse
-// @Router       /api/v1/articles [post]
+// @Failure      400  {object}  http.ErrorResponse
+// @Failure      404  {object}  http.ErrorResponse
+// @Failure      500  {object}  http.ErrorResponse
+// @Router       /http/v1/articles [post]
 func (con *ArticleController) PostArticle(c echo.Context) error {
 	article := new(Article)
 	if err := con.Bind(c, article); err != nil {
@@ -67,16 +67,16 @@ func (con *ArticleController) PostArticle(c echo.Context) error {
 
 func (con *ArticleController) handleErrorResponse(c echo.Context, err error) error {
 	switch err.(type) {
-	case apipkg.InvalidRequestError:
-		return c.JSON(http.StatusBadRequest, apipkg.NewErrorResponse(InvalidRequest, "invalid request.", err.Error()))
+	case httpapi.InvalidRequestError:
+		return c.JSON(http.StatusBadRequest, httpapi.NewErrorResponse(InvalidRequest, "invalid request.", err.Error()))
 	case application.NotFoundError:
-		return c.JSON(http.StatusNotFound, apipkg.NewErrorResponse(NotFound, "resource not found.", err.Error()))
+		return c.JSON(http.StatusNotFound, httpapi.NewErrorResponse(NotFound, "resource not found.", err.Error()))
 	case application.UnknownError:
-		return c.JSON(http.StatusInternalServerError, apipkg.NewErrorResponse(Unknown, "internal server error.", err.Error()))
+		return c.JSON(http.StatusInternalServerError, httpapi.NewErrorResponse(Unknown, "internal server error.", err.Error()))
 	}
-	return c.JSON(http.StatusInternalServerError, apipkg.NewErrorResponse(Unknown, "internal server error.", err.Error()))
+	return c.JSON(http.StatusInternalServerError, httpapi.NewErrorResponse(Unknown, "internal server error.", err.Error()))
 }
 
-func NewController(handler application.Handler, validator apipkg.Validator) *ArticleController {
+func NewController(handler application.Handler, validator httpapi.Validator) *ArticleController {
 	return &ArticleController{handler: handler, validator: validator}
 }

@@ -36,7 +36,7 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/articles": {
+        "/http/v1/articles": {
             "post": {
                 "description": "PostArticle creates a new article and stores it in the data source.",
                 "produces": [
@@ -53,7 +53,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.Article"
+                            "$ref": "#/definitions/http.Article"
                         }
                     }
                 ],
@@ -61,31 +61,31 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.Article"
+                            "$ref": "#/definitions/http.Article"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/v1/articles/{id}": {
+        "/http/v1/articles/{id}": {
             "get": {
                 "description": "GetArticle finds and returns one Article by request ID.",
                 "produces": [
@@ -108,25 +108,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.Article"
+                            "$ref": "#/definitions/http.Article"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "api.Article": {
+        "http.Article": {
             "type": "object",
             "required": [
                 "author",
@@ -167,7 +167,7 @@ var doc = `{
                 }
             }
         },
-        "api.ErrorResponse": {
+        "http.ErrorResponse": {
             "type": "object",
             "properties": {
                 "detail": {
@@ -200,7 +200,7 @@ var SwaggerInfo = swaggerInfo{
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Green Again API server",
-	Description: "This is a green again backend api server",
+	Description: "This is a green again backend http server",
 }
 
 type s struct{}
