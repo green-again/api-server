@@ -18,7 +18,7 @@ type articleHandler struct{
 func (h *articleHandler) GetArticleByID(id string) (*domain.Article, error) {
 	article, err := h.repo.GetArticleByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("GetArticleByID error: %w", err)
+		return nil, fmt.Errorf("[application.articleHandler.GetArticleByID()] err: %w", err)
 	}
 
 	return article, nil
@@ -30,7 +30,7 @@ func (h *articleHandler) CreateArticle(title, author, source, body string, statu
 
 	err := h.repo.SaveArticle(&article)
 	if err != nil {
-		return nil, fmt.Errorf("CreateArticle error: %w", err)
+		return nil, fmt.Errorf("[application.articleHandler.CreateArticle()] err: %w", err)
 	}
 
 	return &article, nil

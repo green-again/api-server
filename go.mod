@@ -3,6 +3,7 @@ module api-server
 go 1.16
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/bxcodec/faker/v3 v3.6.0
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

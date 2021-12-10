@@ -28,7 +28,7 @@ type Article struct {
 func (a *Article) setID(articleID string) error {
 	id, err := marshalID(articleID)
 	if err != nil {
-		return err
+		return fmt.Errorf("[persistence.Article.setID()] err: %w", err)
 	}
 	a.ID = id
 	return nil
@@ -37,7 +37,7 @@ func (a *Article) setID(articleID string) error {
 func (a *Article) toDomain() (*domain.Article, error) {
 	uid, err := uuid.FromBytes(a.ID)
 	if err != nil {
-		return nil, fmt.Errorf("%w article id: %b", UnmarshalBinaryError, a.ID)
+		return nil, fmt.Errorf("[persistence.Article.toDomain()] article id: %s, err: %w", a.ID, UnmarshalBinaryError)
 	}
 
 	ret := domain.NewArticle(uid.String(), a.Title, a.Author, a.Source, a.Body, a.Status)
@@ -47,7 +47,7 @@ func (a *Article) toDomain() (*domain.Article, error) {
 func marshalID(articleID string) ([]byte, error) {
 	id, err := uuid.Parse(articleID)
 	if err != nil {
-		return nil, ParseUUIDError
+		return nil, fmt.Errorf("[persistence.marshalID()] err: %w", ParseUUIDError)
 	}
 
 	return id.MarshalBinary()
@@ -65,7 +65,7 @@ func NewArticleModel(article *domain.Article) (*Article, error) {
 
 	err := ret.setID(article.ID())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("[persistence.NewArticleModel()] err: %w", err)
 	}
 
 	return ret, nil
