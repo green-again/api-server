@@ -1,15 +1,17 @@
 package application_test
 
 import (
-	"api-server/internal/app/article/domain"
 	"errors"
-	"github.com/bxcodec/faker/v3"
+
 	"github.com/google/uuid"
+
+	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"testing"
 
 	"api-server/internal/app/article/application"
+	"api-server/internal/app/article/domain"
 )
 
 func (ts HandlerTestSuite) TestArticleHandler_CreateArticle() {

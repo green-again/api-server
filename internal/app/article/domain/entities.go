@@ -55,6 +55,18 @@ func (a *Article) GenerateID() {
 }
 
 func NewArticle(id, title, author, source, body string, status int) Article {
+	if id == "" {
+		ret := Article{
+			title:  title,
+			author: author,
+			source: source,
+			status: status,
+			body:   body,
+		}
+		ret.GenerateID()
+		return ret
+	}
+
 	return Article{
 		id:     id,
 		title:  title,

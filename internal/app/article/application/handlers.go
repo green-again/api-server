@@ -26,7 +26,6 @@ func (h *articleHandler) GetArticleByID(id string) (*domain.Article, error) {
 
 func (h *articleHandler) CreateArticle(title, author, source, body string, status int) (*domain.Article, error) {
 	article := domain.NewArticle("", title, author, source, body, status)
-	article.GenerateID()
 
 	err := h.repo.SaveArticle(&article)
 	if err != nil {
