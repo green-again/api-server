@@ -16,18 +16,17 @@ import (
 	"api-server/internal/pkg/db"
 )
 
-
 func (ts *RepositoryTestSuite) TestGetArticleByID() {
 	requestArticleID, _ := uuid.NewUUID()
 	articleModelID, _ := requestArticleID.MarshalBinary()
 	invalidArticleModelID := []byte{'1'}
 
-	tests := []struct{
-		scenario string
-		requestID string
-		expectErr  bool
+	tests := []struct {
+		scenario             string
+		requestID            string
+		expectErr            bool
 		expectRecordNotFound bool
-		mockQueryResult []byte
+		mockQueryResult      []byte
 	}{
 		{
 			scenario:        "happy path",
@@ -35,19 +34,19 @@ func (ts *RepositoryTestSuite) TestGetArticleByID() {
 			mockQueryResult: articleModelID,
 		},
 		{
-			scenario: "marshaling failed",
+			scenario:  "marshaling failed",
 			requestID: "not uuid format",
 			expectErr: true,
 		},
 		{
-			scenario: "not found record",
-			expectErr: true,
+			scenario:             "not found record",
+			expectErr:            true,
 			expectRecordNotFound: true,
 		},
 		{
-			scenario: "domain mapping error",
+			scenario:        "domain mapping error",
 			mockQueryResult: invalidArticleModelID,
-			expectErr: true,
+			expectErr:       true,
 		},
 	}
 
@@ -73,10 +72,10 @@ func (ts *RepositoryTestSuite) TestGetArticleByID() {
 }
 
 func (ts *RepositoryTestSuite) TestSaveArticle() {
-	tests := []struct{
-		scenario string
-		inputArticle domain.Article
-		expectErr  bool
+	tests := []struct {
+		scenario         string
+		inputArticle     domain.Article
+		expectErr        bool
 		raiseDatabaseErr bool
 	}{
 		{
