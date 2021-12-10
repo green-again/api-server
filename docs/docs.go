@@ -23,19 +23,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
-            "get": {
-                "summary": "Print HelloWorld",
-                "responses": {
-                    "200": {
-                        "description": "Hello, World",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/http/v1/articles": {
             "post": {
                 "description": "PostArticle creates a new article and stores it in the data source.",
@@ -53,7 +40,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.Article"
+                            "$ref": "#/definitions/api.Article"
                         }
                     }
                 ],
@@ -61,7 +48,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.Article"
+                            "$ref": "#/definitions/api.Article"
                         }
                     },
                     "400": {
@@ -108,7 +95,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.Article"
+                            "$ref": "#/definitions/api.Article"
                         }
                     },
                     "400": {
@@ -134,7 +121,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "http.Article": {
+        "api.Article": {
             "type": "object",
             "required": [
                 "author",

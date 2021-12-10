@@ -1,26 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a green again backend api server",
+        "description": "This is a green again backend http server",
         "title": "Green Again API server",
         "contact": {},
         "version": "1.0"
     },
     "paths": {
-        "/": {
-            "get": {
-                "summary": "Print HelloWorld",
-                "responses": {
-                    "200": {
-                        "description": "Hello, World",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/articles": {
+        "/http/v1/articles": {
             "post": {
                 "description": "PostArticle creates a new article and stores it in the data source.",
                 "produces": [
@@ -51,25 +38,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/api/v1/articles/{id}": {
+        "/http/v1/articles/{id}": {
             "get": {
                 "description": "GetArticle finds and returns one Article by request ID.",
                 "produces": [
@@ -98,19 +85,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/http.ErrorResponse"
                         }
                     }
                 }
@@ -151,7 +138,7 @@
                 }
             }
         },
-        "api.ErrorResponse": {
+        "http.ErrorResponse": {
             "type": "object",
             "properties": {
                 "detail": {
