@@ -1,12 +1,11 @@
 package application_test
 
 import (
-	"api-server/internal/app/article/infrastructure/persistence"
-	"api-server/internal/pkg/db"
+	"api-server/internal/app/article/domain"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"testing"
 
@@ -15,51 +14,49 @@ import (
 
 func (ts HandlerTestSuite) TestArticleHandler_CreateArticle() {
 	tests := []struct {
-		scenario   string
+		scenario string
 
-		title      string
-		author     string
-		source     string
-		body       string
-		status     int
+		title  string
+		author string
+		source string
+		body   string
+		status int
 
-		expectErr  bool
+		mockSaveArticleResult error
+		expectErr             bool
 	}{
 		{
 			scenario: "happy path.",
 
-			title: faker.Sentence(),
+			title:  faker.Sentence(),
 			author: faker.Name(),
 			source: faker.URL(),
-			body: faker.Paragraph(),
+			body:   faker.Paragraph(),
 			status: 1,
 
-			expectErr: false,
+			mockSaveArticleResult: nil,
+			expectErr:             false,
 		},
 		{
 			scenario: "If the repository returns an error while creating an article, handler return an error also.",
 
-			title: faker.Sentence(),
+			title:  faker.Sentence(),
 			author: faker.Name(),
 			source: faker.URL(),
-			body: faker.Paragraph(),
+			body:   faker.Paragraph(),
 			status: 1,
 
-			expectErr: true,
+			mockSaveArticleResult: errors.New("test error"),
+			expectErr:             true,
 		},
 	}
 
 	for _, tt := range tests {
-		ts.dbMock.ExpectBegin()
-
-		if tt.expectErr {
-			ts.dbMock.ExpectExec("UPDATE `articles`").WillReturnError(errors.New("raise error"))
-		} else {
-			ts.dbMock.ExpectExec("UPDATE `articles`").WillReturnResult(sqlmock.NewResult(1, 1))
-		}
-		ts.dbMock.ExpectCommit()
+		ts.repo.On("SaveArticle", mock.AnythingOfType("*domain.Article")).
+			Return(tt.mockSaveArticleResult).Once()
 
 		actual, err := ts.handler.CreateArticle(tt.title, tt.author, tt.source, tt.body, tt.status)
+
 		if tt.expectErr {
 			ts.Error(err)
 		} else {
@@ -76,22 +73,81 @@ func (ts HandlerTestSuite) TestArticleHandler_CreateArticle() {
 	}
 }
 
-type HandlerTestSuite struct {
-	suite.Suite
-	dbMock sqlmock.Sqlmock
+func (ts *HandlerTestSuite) TestArticleHandler_GetArticleByID() {
+	tests := []struct {
+		scenario string
 
-	handler	application.Handler
-	repo *persistence.ArticleRepository
+		id string
+
+		mockGetArticleMethod func(string) (*domain.Article, error)
+		expectErr            bool
+	}{
+		{
+			scenario: "happy path.",
+			id:       uuid.NewString(),
+
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				ret := domain.NewArticle(
+					articleID,
+					faker.Sentence(),
+					faker.Sentence(),
+					faker.Sentence(),
+					faker.Sentence(),
+					1,
+				)
+				return &ret, nil
+			},
+			expectErr: false,
+		},
+		{
+			scenario: "If the repository returns an error while creating an article, handler return an error also.",
+			id:       uuid.NewString(),
+
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				return nil, errors.New("test error")
+			},
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		ts.repo.On("GetArticleByID", tt.id).Return(tt.mockGetArticleMethod(tt.id)).Once()
+		actual, err := ts.handler.GetArticleByID(tt.id)
+		if tt.expectErr {
+			ts.Error(err)
+		} else {
+			ts.Equal(tt.id, actual.ID())
+		}
+	}
 }
 
-func TestControllerSuite(t *testing.T) {
+type HandlerTestSuite struct {
+	suite.Suite
+
+	handler application.Handler
+	repo    *mockRepository
+}
+
+func TestHandlerSuite(t *testing.T) {
 	suite.Run(t, new(HandlerTestSuite))
 }
 
 func (ts *HandlerTestSuite) SetupTest() {
-	dbSource, sqlmock := db.NewMockSQL()
-	ts.dbMock = sqlmock
-	ts.repo = persistence.NewArticleRepository(dbSource)
+	ts.repo = new(mockRepository)
 	handler := application.NewArticleHandler(ts.repo)
 	ts.handler = handler
+}
+
+type mockRepository struct {
+	mock.Mock
+}
+
+func (r *mockRepository) GetArticleByID(articleID string) (*domain.Article, error) {
+	ret := r.Called(articleID)
+	return ret.Get(0).(*domain.Article), ret.Error(1)
+}
+
+func (r *mockRepository) SaveArticle(article *domain.Article) error {
+	ret := r.Called(article)
+	return ret.Error(0)
 }

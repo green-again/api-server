@@ -6,7 +6,7 @@ type Binder interface {
 	Bind(c echo.Context, model interface{}) error
 }
 
-type RequestBinder struct {}
+type RequestBinder struct{}
 
 func (b RequestBinder) Bind(c echo.Context, model interface{}) error {
 	if err := c.Bind(model); err != nil {

@@ -24,10 +24,10 @@ import (
 
 func (ts *ControllerTestSuite) TestPostArticles() {
 	tests := []struct {
-		scenario         string
-		requestBody      string
-		mockFunc         func() (*domain.Article, error)
-		expectedCode     int
+		scenario     string
+		requestBody  string
+		mockFunc     func() (*domain.Article, error)
+		expectedCode int
 	}{
 		{
 			scenario: "Happy path",

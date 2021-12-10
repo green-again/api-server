@@ -56,11 +56,11 @@ func (a *Article) GenerateID() {
 
 func NewArticle(id, title, author, source, body string, status int) Article {
 	return Article{
-		id: id,
-		title: title,
+		id:     id,
+		title:  title,
 		author: author,
 		source: source,
 		status: status,
-		body: body,
+		body:   body,
 	}
 }

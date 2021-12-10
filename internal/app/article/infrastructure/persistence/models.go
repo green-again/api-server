@@ -55,11 +55,11 @@ func marshalID(articleID string) ([]byte, error) {
 
 func NewArticleModel(article *domain.Article) (*Article, error) {
 	ret := &Article{
-		Title: article.Title(),
-		Author: article.Author(),
-		Source: article.Source(),
-		Body: article.Body(),
-		Status: article.Status(),
+		Title:         article.Title(),
+		Author:        article.Author(),
+		Source:        article.Source(),
+		Body:          article.Body(),
+		Status:        article.Status(),
 		PublishedDate: article.PublishedDate(),
 	}
 

@@ -11,7 +11,7 @@ type Handler interface {
 	CreateArticle(title, author, source, body string, status int) (*domain.Article, error)
 }
 
-type articleHandler struct{
+type articleHandler struct {
 	repo domain.ArticleRepository
 }
 

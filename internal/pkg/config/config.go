@@ -7,11 +7,11 @@ type Config struct {
 }
 
 type dbConfig struct {
-	dbHost string
-	dbUser string
+	dbHost     string
+	dbUser     string
 	dbPassword string
-	dbName string
-	dbPort string
+	dbName     string
+	dbPort     string
 }
 
 func (c Config) DBHost() string {

@@ -11,7 +11,7 @@ func NewMockSQL() (*gorm.DB, sqlmock.Sqlmock) {
 	db, mock, _ := sqlmock.New()
 
 	mockEngine, _ := gorm.Open(mysql.New(mysql.Config{
-		Conn: db,
+		Conn:                      db,
 		SkipInitializeWithVersion: true,
 	}), &gorm.Config{})
 

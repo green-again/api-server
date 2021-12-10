@@ -19,8 +19,8 @@ func NewHTTPServer(cfg *config.Config) *echo.Echo {
 		dbEngine = db.ConnectDatabase(cfg)
 
 		articleRepository = articleRepo.NewArticleRepository(dbEngine)
-		articleHandler = articleService.NewArticleHandler(articleRepository)
-		articleValidator = articleAPI.NewGetArticleRequestValidator()
+		articleHandler    = articleService.NewArticleHandler(articleRepository)
+		articleValidator  = articleAPI.NewGetArticleRequestValidator()
 		articleController = articleAPI.NewController(articleHandler, articleValidator)
 	)
 
