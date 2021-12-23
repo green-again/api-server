@@ -1,15 +1,103 @@
+definitions:
+  api.Article:
+    properties:
+      author:
+        type: string
+      body:
+        type: string
+      id:
+        type: string
+      publishedDate:
+        type: string
+      source:
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+    required:
+    - author
+    - body
+    - source
+    - status
+    - title
+    type: object
+  http.ErrorResponse:
+    properties:
+      detail:
+        type: string
+      error:
+        type: string
+      message:
+        type: string
+    type: object
 info:
   contact: {}
-  description: This is a green again backend api server
+  description: This is a green again backend http server
   title: Green Again API server
   version: "1.0"
 paths:
-  /:
-    get:
+  /http/v1/articles:
+    post:
+      description: PostArticle creates a new article and stores it in the data source.
+      parameters:
+      - description: Article ingredient
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/api.Article'
+      produces:
+      - application/json
       responses:
         "200":
-          description: Hello, World
+          description: OK
           schema:
-            type: string
-      summary: Print HelloWorld
+            $ref: '#/definitions/api.Article'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Create new article.
+      tags:
+      - Articles
+  /http/v1/articles/{id}:
+    get:
+      description: GetArticle finds and returns one Article by request ID.
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Article'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Show an article details.
+      tags:
+      - Articles
 swagger: "2.0"
