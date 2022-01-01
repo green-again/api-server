@@ -18,6 +18,7 @@ func registerV1APIRoutes(router *echo.Echo, articleController *article.ArticleCo
 	{
 		v1.POST("/articles", articleController.PostArticle)
 		v1.GET("/articles/:id", articleController.GetArticle)
+		v1.PUT("/articles/:id", articleController.UpdateArticle)
 	}
 }
 

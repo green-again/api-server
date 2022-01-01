@@ -96,6 +96,87 @@ func (ts *ControllerTestSuite) TestPostArticles() {
 	}
 }
 
+func (ts *ControllerTestSuite) TestUpdateArticles() {
+	tests := []struct {
+		scenario     string
+		pathParam string
+		requestBody  string
+		mockFunc     func() (*domain.Article, error)
+		expectedCode int
+	}{
+		{
+			scenario: "Happy path",
+			pathParam: MockArticles()[0].ID(),
+			requestBody: fmt.Sprintf(
+				`{"title":"%s","body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Sentence(),
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				2,
+			),
+			mockFunc: func() (*domain.Article, error) {
+				return &MockArticles()[0], nil
+			},
+			expectedCode: http.StatusOK,
+		},
+		{
+			scenario: "If parameter is missing, it should returns 400 error.",
+			pathParam: MockArticles()[1].ID(),
+			requestBody: fmt.Sprintf(
+				`{"body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				1,
+			),
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			scenario: "If an unknown error occurs during processing, an error 500 should be returned.",
+			pathParam: MockArticles()[2].ID(),
+			requestBody: fmt.Sprintf(
+				`{"title":"%s","body":"%s","author":"%s","source":"%s","status":%d}`,
+				faker.Sentence(),
+				faker.Paragraph(),
+				faker.Name(),
+				faker.URL(),
+				1,
+			),
+			mockFunc: func() (*domain.Article, error) {
+				return nil, errors.New("unknown error")
+			},
+			expectedCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		e := echo.New()
+		e.Validator = httpapi.NewRequestValidator()
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/http/v1/articles/%s", tt.pathParam), strings.NewReader(tt.requestBody))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		if tt.mockFunc != nil {
+			ts.handler.On(
+				"UpdateArticle",
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("string"),
+				mock.AnythingOfType("int"),
+			).Return(tt.mockFunc()).Once()
+		}
+		err := ts.controller.UpdateArticle(c)
+		ts.NoError(err)
+		ts.Equal(tt.expectedCode, rec.Code)
+
+		ts.handler.AssertExpectations(ts.T())
+	}
+}
+
 func (ts *ControllerTestSuite) TestGetArticles() {
 	tests := []struct {
 		scenario         string
@@ -216,5 +297,10 @@ func (h *mockHandler) GetArticleByID(id string) (*domain.Article, error) {
 
 func (h *mockHandler) CreateArticle(title, author, source, body string, status int) (*domain.Article, error) {
 	ret := h.Called(title, author, source, body, status)
+	return ret.Get(0).(*domain.Article), ret.Error(1)
+}
+
+func (h *mockHandler) UpdateArticle(id, title, author, source, body string, status int) (*domain.Article, error) {
+	ret := h.Called(id, title, author, source, body, status)
 	return ret.Get(0).(*domain.Article), ret.Error(1)
 }

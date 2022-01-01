@@ -2,7 +2,6 @@ package application_test
 
 import (
 	"errors"
-
 	"github.com/google/uuid"
 
 	"github.com/bxcodec/faker/v3"
@@ -12,6 +11,11 @@ import (
 
 	"api-server/internal/app/article/application"
 	"api-server/internal/app/article/domain"
+)
+
+const (
+	statusDraft = iota
+	statusPublished
 )
 
 func (ts HandlerTestSuite) TestArticleHandler_CreateArticle() {
@@ -119,6 +123,133 @@ func (ts *HandlerTestSuite) TestArticleHandler_GetArticleByID() {
 			ts.Error(err)
 		} else {
 			ts.Equal(tt.id, actual.ID())
+		}
+	}
+}
+
+func (ts *HandlerTestSuite) TestArticleHandler_UpdateArticle() {
+	testArticleID := uuid.NewString()
+
+	tests := []struct {
+		scenario string
+
+		id string
+		title  string
+		author string
+		source string
+		body   string
+		status int
+
+		mockSaveArticleResult error
+		mockGetArticleMethod func(string) (*domain.Article, error)
+		expectErr            bool
+	}{
+		{
+			scenario: "happy path",
+
+			id: testArticleID,
+			title:  faker.Sentence(),
+			author: faker.Name(),
+			source: faker.URL(),
+			body:   faker.Paragraph(),
+			status: statusPublished,
+
+			mockSaveArticleResult: nil,
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				ret := domain.NewArticle(
+					articleID,
+					faker.Sentence(),
+					faker.Name(),
+					faker.URL(),
+					faker.Paragraph(),
+					statusDraft,
+				)
+				return &ret, nil
+			},
+		},
+		{
+			scenario: "if saving the article fails, an error should be returned.",
+
+			id: testArticleID,
+			title:  faker.Sentence(),
+			author: faker.Name(),
+			source: faker.URL(),
+			body:   faker.Paragraph(),
+			status: statusPublished,
+
+			mockSaveArticleResult: errors.New("test error"),
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				ret := domain.NewArticle(
+					articleID,
+					faker.Sentence(),
+					faker.Name(),
+					faker.URL(),
+					faker.Paragraph(),
+					statusDraft,
+				)
+				return &ret, nil
+			},
+			expectErr: true,
+		},
+		{
+			scenario: "if the article to be updated does not exist, an error should be returned.",
+
+			id: testArticleID,
+			title:  faker.Sentence(),
+			author: faker.Name(),
+			source: faker.URL(),
+			body:   faker.Paragraph(),
+			status: statusPublished,
+
+			mockSaveArticleResult: nil,
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				return nil, errors.New("test error")
+			},
+			expectErr: true,
+		},
+		{
+			scenario: "when updating a published article to a draft, an error should be returned.",
+
+			id: testArticleID,
+			title:  faker.Sentence(),
+			author: faker.Name(),
+			source: faker.URL(),
+			body:   faker.Paragraph(),
+			status: statusDraft,
+
+			mockSaveArticleResult: nil,
+			mockGetArticleMethod: func(articleID string) (*domain.Article, error) {
+				ret := domain.NewArticle(
+					articleID,
+					faker.Sentence(),
+					faker.Name(),
+					faker.URL(),
+					faker.Paragraph(),
+					statusPublished,
+				)
+				return &ret, nil
+			},
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		ts.repo.On("GetArticleByID", tt.id).Return(tt.mockGetArticleMethod(tt.id)).Once()
+		ts.repo.On("SaveArticle", mock.AnythingOfType("*domain.Article")).Return(tt.mockSaveArticleResult).Once()
+
+		actual, err := ts.handler.UpdateArticle(tt.id, tt.title, tt.author, tt.source, tt.body, tt.status)
+		if tt.expectErr {
+			ts.Error(err)
+		} else {
+			ts.NoError(err)
+
+			_, err = uuid.Parse(actual.ID())
+			ts.NoError(err)
+			ts.Equal(tt.title, actual.Title())
+			ts.Equal(tt.author, actual.Author())
+			ts.Equal(tt.source, actual.Source())
+			ts.Equal(tt.body, actual.Body())
+			ts.Equal(tt.status, actual.Status())
 		}
 	}
 }
