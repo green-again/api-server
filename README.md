@@ -1,4 +1,6 @@
 # api-server
+[![codecov](https://codecov.io/gh/green-again/api-server/branch/main/graph/badge.svg?token=4QMN3KAL3G)](https://codecov.io/gh/green-again/api-server)
+
 green-again api server repository
 
 ### Prerequisites
