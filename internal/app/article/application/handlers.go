@@ -9,6 +9,7 @@ import (
 type Handler interface {
 	GetArticleByID(id string) (*domain.Article, error)
 	CreateArticle(title, author, source, body string, status int) (*domain.Article, error)
+	UpdateArticle(id, title, author, source, body string, status int) (*domain.Article, error)
 }
 
 type articleHandler struct {
@@ -33,6 +34,25 @@ func (h *articleHandler) CreateArticle(title, author, source, body string, statu
 	}
 
 	return &article, nil
+}
+
+func (h *articleHandler) UpdateArticle(id, title, author, source, body string, status int) (*domain.Article, error) {
+	article, err := h.repo.GetArticleByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("[application.articleHandler.UpdateArticle()] err: %w", err)
+	}
+
+	err = article.Update(title, author, source, body, status)
+	if err != nil {
+		return nil, fmt.Errorf("[application.articleHandler.UpdateArticle()] err: %w", err)
+	}
+
+	err = h.repo.SaveArticle(article)
+	if err != nil {
+		return nil, fmt.Errorf("[application.articleHandler.UpdateArticle()] err: %w", err)
+	}
+
+	return article, nil
 }
 
 func NewArticleHandler(repository domain.ArticleRepository) Handler {

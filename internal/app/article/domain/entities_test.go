@@ -12,9 +12,14 @@ import (
 
 const expectNewUUID = ""
 
+const (
+	statusDraft = iota
+	statusPublished
+)
+
 var existedUUID = uuid.NewString()
 
-func TestArticle(t *testing.T) {
+func TestCreateArticle(t *testing.T) {
 	tests := []struct {
 		scenario string
 
@@ -33,12 +38,51 @@ func TestArticle(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual := domain.NewArticle(tt.inputID, faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), 1)
+		actual := domain.NewArticle(tt.inputID, faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), statusDraft)
 		if tt.expected == expectNewUUID {
 			_, err := uuid.Parse(actual.ID())
 			assert.NoError(t, err)
 		} else {
 			assert.Equal(t, tt.expected, actual.ID())
 		}
+	}
+}
+
+func TestUpdateArticleStatus(t *testing.T) {
+	tests := []struct {
+		scenario string
+		existedArticle domain.Article
+		newStatus int
+		expectedStatus int
+		expectedErr error
+	}{
+		{
+			scenario: "happy path",
+			existedArticle: domain.NewArticle(existedUUID, faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), statusDraft),
+			newStatus: statusPublished,
+			expectedStatus: statusPublished,
+			expectedErr: nil,
+		},
+		{
+			scenario: "if the article status is published. the status cannot be changed back to a draft",
+			existedArticle: domain.NewArticle(existedUUID, faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), statusPublished),
+			newStatus: statusDraft,
+			expectedStatus: statusPublished,
+			expectedErr: domain.AlreadyPublishedError,
+		},
+		{
+			scenario: "if new article status is invalid, the status cannot be changed",
+			existedArticle: domain.NewArticle(existedUUID, faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), statusDraft),
+			newStatus: 4,
+			expectedStatus: statusDraft,
+			expectedErr: domain.InvalidStatusError,
+		},
+	}
+
+	for _, tt := range tests {
+		err := tt.existedArticle.Update(faker.Sentence(), faker.Name(), faker.URL(), faker.Paragraph(), tt.newStatus)
+
+		assert.ErrorIs(t, err, tt.expectedErr)
+		assert.Equal(t, tt.existedArticle.Status(), tt.expectedStatus)
 	}
 }
