@@ -1,6 +1,6 @@
 {
   "ipcMode": null,
-  "executionRoleArn": null,
+  "executionRoleArn": "arn:aws:iam::369810017339:role/green-again-server-ECSServiceRole-142XB8QFH9DHL",
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
@@ -17,13 +17,35 @@
       "command": null,
       "linuxParameters": null,
       "cpu": 256,
-      "environment": [],
+      "environment": [
+        {
+          "name": "DB_HOST",
+          "value": "green-again.cpwxngv1q4lh.ap-northeast-2.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_PORT",
+          "value": 3306
+        },
+        {
+          "name": "DB_NAME",
+          "value": "greenagain"
+        },
+        {
+          "name": "DB_USER",
+          "value": "apiserver"
+        }
+      ],
       "resourceRequirements": null,
       "ulimits": null,
       "dnsServers": null,
       "mountPoints": [],
       "workingDirectory": null,
-      "secrets": null,
+      "secrets": [
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:369810017339:secret:DB_PASSWORD-dG7fIi"
+        }
+      ],
       "dockerSecurityOptions": null,
       "memory": 256,
       "memoryReservation": null,
