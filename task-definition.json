@@ -24,7 +24,7 @@
         },
         {
           "name": "DB_PORT",
-          "value": 3306
+          "value": "3306"
         },
         {
           "name": "DB_NAME",
