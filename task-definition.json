@@ -5,7 +5,14 @@
     {
       "dnsSearchDomains": null,
       "environmentFiles": null,
-      "logConfiguration": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "ECSLogGroup-green-again-server",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "api-server"
+        }
+      },
       "entryPoint": null,
       "portMappings": [
         {
